@@ -41,37 +41,40 @@
     return s;
   };
   const getActive=()=>{
-    const a=read('sessionStorage',activeKey),task=find(a?.id);
+    const a=read('localStorage',activeKey),task=find(a?.id);
     if(!task||typeof a.day!=='string'||!Number.isInteger(a.index)||a.index<0||a.index>=task.questions.length||!Array.isArray(a.answers)||a.answers.length!==a.index)return null;
     if(!a.answers.every((value,i)=>Number.isInteger(value)&&value>=0&&value<task.questions[i].options.length))return null;
     if(a.pick!==null&&(!Number.isInteger(a.pick)||a.pick<0||a.pick>=task.questions[a.index].options.length))a.pick=null;
     return a;
   };
-  const stop=()=>remove('sessionStorage',activeKey);
+  const stop=()=>remove('localStorage',activeKey);
   const begin=(id,force=false)=>{
     const task=find(id);if(!task)return null;
     const old=getActive();if(!force&&old?.id===id&&old.day===today())return old;
-    const a={id,day:today(),index:0,answers:[],pick:null};write('sessionStorage',activeKey,a);
+    const stage=window.GradeProgress?.state(),a={id,day:today(),index:0,answers:[],pick:null,direction:stage?.direction||null,stageId:stage?.stageId||null};write('localStorage',activeKey,a);
     ['inis.training.draft.v1','inis.training.result.v1','inis.training.hint-return.v1'].forEach(key=>remove('sessionStorage',key));return a;
   };
   const resolve=()=>{const id=new URLSearchParams(location.search).get('daily');return find(id)?begin(id):getActive();};
-  const select=pick=>{const a=getActive();if(a){a.pick=pick;write('sessionStorage',activeKey,a);}};
+  const select=pick=>{const a=getActive();if(a){a.pick=pick;write('localStorage',activeKey,a);}};
   const summary=(a,completed)=>{
     const task=find(a.id),correct=a.answers.reduce((sum,pick,i)=>sum+Number(pick===task.questions[i].correct),0);
     const score=Math.round(correct/task.questions.length*100);
-    return {id:a.id,title:task.title,day:a.day,completed,score,correct,total:task.questions.length,passed:completed&&score>=threshold,answers:a.answers.map((pick,i)=>({title:task.questions[i].title,answer:task.questions[i].options[pick],correct:pick===task.questions[i].correct,expected:task.questions[i].options[task.questions[i].correct],explanation:task.questions[i].explanation}))};
+    return {direction:a.direction,stageId:a.stageId,id:a.id,title:task.title,day:a.day,completed,score,correct,total:task.questions.length,passed:completed&&score>=threshold,answers:a.answers.map((pick,i)=>({title:task.questions[i].title,answer:task.questions[i].options[pick],correct:pick===task.questions[i].correct,expected:task.questions[i].options[task.questions[i].correct],explanation:task.questions[i].explanation}))};
   };
+  const record=(result,early)=>window.Platform?.addHistory({id:`daily-${result.id}-${Date.now()}`,mode:'daily',direction:result.direction,stageId:result.stageId,ids:find(result.id).questions.map((_,i)=>`daily-${result.id}-${i}`),answers:result.answers.map((v,i)=>({...v,id:`daily-${result.id}-${i}`,topic:find(result.id).topic,score:v.correct?100:0,type:'choice'})),score:result.score,total:result.total,early,finishedAt:new Date().toISOString()});
+  const finishEarly=()=>{const a=getActive();if(!a)return null;const result=summary(a,false);record(result,true);stop();return result;};
   const submit=pick=>{
     const a=getActive();if(!a)return null;const task=find(a.id);
     if(!Number.isInteger(pick)||pick<0||pick>=task.questions[a.index].options.length)return null;
     a.answers.push(pick);a.index++;a.pick=null;
-    if(a.index<task.questions.length){write('sessionStorage',activeKey,a);return {next:true};}
+    if(a.index<task.questions.length){write('localStorage',activeKey,a);return {next:true};}
     const result=summary(a,true);
     if(a.day===today()){const s=state();s.tasks[a.id]={status:result.passed?'completed':'needs-review',score:result.score};write('localStorage',stateKey,s);}
+    record(result,false);
     stop();return {next:false,result};
   };
   const pause=()=>{const a=getActive();return a?summary(a,false):null;};
-  window.DailyTasks={tasks,threshold,find,getActive,resolve,select,submit,pause,stop,state};
+  window.DailyTasks={tasks,threshold,find,getActive,resolve,select,submit,pause,finishEarly,stop,state};
   const setup=()=>{
     const s=state(),active=getActive();
     const status=task=>{const value=s.tasks[task.id];if(value?.status==='completed')return {className:'is-complete',text:`Выполнено · ${value.score}%`};if(value?.status==='needs-review')return {className:'needs-review',text:`Нужно повторить · ${value.score}%`};return {className:'',text:active?.id===task.id&&active.day===today()?'В процессе':'Не выполнено'};};

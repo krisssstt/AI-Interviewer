@@ -42,7 +42,7 @@
       </button>
     </header>`;
 
-  const question = document.querySelector('[data-training-question]');
+  const question = new URLSearchParams(location.search).has('daily') ? document.querySelector('[data-training-question]') : null;
   if (question) {
     const daily = window.DailyTasks?.resolve();
     const dailyTask = daily && window.DailyTasks.find(daily.id);
@@ -113,6 +113,7 @@
       if(daily.pick!==null)answer.value=dailyQuestion.options[daily.pick];else answer.value='';
       form.querySelector('#sendb').lastChild.textContent = daily.index===dailyTask.questions.length-1 ? ' Завершить задание' : ' Следующий вопрос';
       hintLink.href=`training-question-2.html?daily=${daily.id}`;
+      const hintsEnabled=window.Platform?.store.get('inis.training.options.v2',{hints:true})?.hints!==false;if(!hintsEnabled){hintLink.hidden=true;question.querySelector('.question-rag').hidden=true;}
     }
 
     const setError = message => {
@@ -197,7 +198,7 @@
         <button class="form-button secondary" id="cancel-exit" type="button" autofocus>Продолжить интервью</button>
         <button class="form-button" id="confirm-exit" type="button">Завершить</button>
       </div>`;
-    if(dailyQuestion){exitDialog.querySelector('#exit-title').textContent='Выйти из задания?';exitDialog.querySelector('#exit-description').textContent='Прогресс сохранится. Задание можно продолжить позже.';exitDialog.querySelector('#cancel-exit').textContent='Продолжить задание';exitDialog.querySelector('#confirm-exit').textContent='Выйти';}
+    if(dailyQuestion){exitDialog.querySelector('#exit-title').textContent='Выйти из задания?';exitDialog.querySelector('#exit-description').textContent='Прогресс сохранится. Задание можно продолжить позже.';exitDialog.querySelector('#cancel-exit').textContent='Продолжить задание';exitDialog.querySelector('#confirm-exit').textContent='Завершить досрочно';const pause=document.createElement('button');pause.type='button';pause.className='form-button secondary';pause.textContent='Сохранить и выйти';pause.addEventListener('click',()=>{stopListening();window.location.assign('main.html');});exitDialog.querySelector('.exit-actions').prepend(pause);}
     document.body.append(exitDialog);
     exitTrigger.addEventListener('click', () => {
       stopListening();
@@ -214,7 +215,8 @@
     exitDialog.querySelector('#confirm-exit').addEventListener('click', () => {
       stopListening();
       saveDraft();
-      storage.set(RESULT_KEY, { answer: answer.value.trim(), submitted: false, ...(dailyQuestion ? {daily:window.DailyTasks.pause()} : {}) });
+      storage.set(RESULT_KEY, { answer: answer.value.trim(), submitted: false, ...(dailyQuestion ? {daily:window.DailyTasks.finishEarly()} : {}) });
+      if(dailyQuestion)window.DailyTasks.stop();
       window.location.assign('training-results.html');
     });
 
@@ -265,7 +267,7 @@
       catch { status.textContent = 'Не удалось включить микрофон. Введите ответ с клавиатуры.'; }
     });
 
-    if (question.dataset.trainingQuestion === 'hint') {
+    if (question.dataset.trainingQuestion === 'hint' && !hintLink.hidden) {
       const overlay = document.createElement('div');
       overlay.className = 'hint-overlay';
       overlay.innerHTML = `
@@ -320,17 +322,17 @@
     if(result?.daily){
       const daily=result.daily;
       results.querySelector('.app-header h1').textContent='Ежедневные задания';
-      results.querySelector('.results-title').textContent=daily.completed?'Итоги ежедневного задания':'Задание не завершено';
-      const score=results.querySelector('.results-score');score.querySelector('span').textContent=daily.completed?`${daily.score}%`:`${daily.answers.length}/${daily.total}`;
+      results.querySelector('.results-title').textContent=daily.completed?'Итоги ежедневного задания':'Задание завершено досрочно';
+      const score=results.querySelector('.results-score');score.querySelector('span').textContent=`${daily.score}%`;
       score.setAttribute('aria-label',daily.completed?`Результат задания: ${daily.score} процентов`:`Решено ${daily.answers.length} из ${daily.total}`);
-      score.style.background=`conic-gradient(#428266 ${daily.completed?daily.score:daily.answers.length/daily.total*100}%, #dce8e2 0)`;
+      score.style.background=`conic-gradient(var(--meter-fill) ${daily.score}%, var(--meter-track) 0)`;
       const resultIsToday=daily.day===window.DailyTasks.state().day;
-      results.querySelector('.results-caption').textContent=daily.completed&&!resultIsToday?`Задание за ${daily.day} завершено. Сегодня доступен новый план.`:daily.completed?(daily.passed?'Задание выполнено. Пункт отмечен в плане на сегодня.':'Нужно повторить. Пункт выделен в плане на сегодня.'):'Прогресс сохранён. Продолжите задание, чтобы получить результат.';
+      results.querySelector('.results-caption').textContent=daily.completed&&!resultIsToday?`Задание за ${daily.day} завершено. Сегодня доступен новый план.`:daily.completed?(daily.passed?'Задание выполнено. Пункт отмечен в плане на сегодня.':'Нужно повторить. Пункт выделен в плане на сегодня.'):'Досрочное завершение не отмечает задание выполненным. Можно начать новую попытку.';
       const skills=results.querySelector('.results-skills');skills.replaceChildren();
       const row=document.createElement('div');row.className='result-skill';const name=document.createElement('dt');name.textContent=daily.title;const value=document.createElement('dd');value.textContent=`${daily.correct} / ${daily.total}`;const bar=document.createElement('progress');bar.max=daily.total;bar.value=daily.correct;bar.setAttribute('aria-label',`Верных ответов: ${daily.correct} из ${daily.total}`);row.append(name,value,bar);skills.append(row);
       results.querySelector('#recommendation-title').textContent='Рекомендация';
-      results.querySelector('.results-recommendation p').textContent=daily.completed?(daily.passed?'Продолжайте с оставшимися заданиями. В разборе можно проверить каждый ответ.':'Откройте разбор ответов, повторите слабые темы и пройдите задание заново. Для выполнения нужно не менее 70%.'):'Досрочный выход не отмечает задание выполненным. Продолжите сохранённую попытку.';
-      const link=results.querySelector('.results-analytics');link.href=`daily-tasks.html?task=${daily.id}`;link.textContent=daily.completed?'К ежедневным заданиям':'Продолжить задание';
+      results.querySelector('.results-recommendation p').textContent=daily.completed?(daily.passed?'Продолжайте с оставшимися заданиями. В разборе можно проверить каждый ответ.':'Откройте разбор ответов, повторите слабые темы и пройдите задание заново. Для выполнения нужно не менее 70%.'):'Досрочное завершение не отмечает задание выполненным. Начните новую попытку.';
+      const link=results.querySelector('.results-analytics');link.href=`daily-tasks.html?task=${daily.id}`;link.textContent=daily.completed?'К ежедневным заданиям':'Начать задание заново';
       const home=document.createElement('a');home.href='main.html';home.className='form-button secondary';home.textContent='К плану на сегодня';link.after(home);
       const review=document.getElementById('review-dialog');const title=document.createElement('h2');title.id='review-title';title.textContent='Разбор задания';const reviewStatus=document.createElement('p');reviewStatus.id='review-status';reviewStatus.textContent=`Верных ответов: ${daily.correct} из ${daily.total}`;
       const lastAnswer=document.createElement('p');lastAnswer.id='review-answer';lastAnswer.textContent=result.answer||'Ответ не был отправлен.';lastAnswer.hidden=true;
@@ -359,7 +361,7 @@
     });
     overlay.addEventListener('keydown', event => {
       if (event.key === 'Escape') setReview(false);
-      if (event.key === 'Tab') { event.preventDefault(); close.focus(); }
+      if(event.key==='Tab'){const focusable=[...overlay.querySelectorAll('a[href],button')].filter(x=>!x.disabled);const first=focusable[0],last=focusable.at(-1);if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}}
     });
   }
 

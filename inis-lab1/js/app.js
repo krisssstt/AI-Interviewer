@@ -11,6 +11,7 @@
     let nav = root.querySelector('.app-nav');
     // Active interviews expose only a confirmed exit.
     if (root.matches('[data-training-question]')) { nav?.remove(); nav = null; }
+    if(nav){const icons=['ic-nav-home-off.svg','ic-nav-chat.svg','ic-nav-books.svg','ic-nav-chart.svg','ic-nav-profile.svg'];nav.querySelectorAll('a img').forEach((img,i)=>{if(icons[i])img.src='../images/icons/'+icons[i];});}
     nav?.remove();
     const content = document.createElement('div'); content.className = 'app-content';
     if (root.querySelector('.support-layout')) content.classList.add('support-content');
@@ -33,16 +34,17 @@
         <button class="header-action" type="button" data-close-menu aria-label="Закрыть меню"><img src="../images/icons/ic-close.svg" alt=""></button>
       </header>
       <div class="side-menu-content"><p>Дополнительно</p><nav class="side-menu-links" aria-label="Дополнительная навигация">
-        <a href="kb-1.html?view=favorites"><img src="../images/icons/ic-m-fav.svg" alt=""><span>Избранное</span></a>
+        <a href="kb-1.html?view=favorites"><img src="../images/icons/ic-hist-star.svg" alt=""><span>Избранное</span></a>
         <a href="profile-4.html" data-open-notifications><img src="../images/icons/ic-m-bell.svg" alt=""><span>Уведомления</span></a>
         <a href="profile-2.html"><img src="../images/icons/ic-m-support.svg" alt=""><span>Поддержка</span></a>
         <a href="profile-3.html"><img src="../images/icons/ic-m-gear.svg" alt=""><span>Мои данные</span></a>
       </nav>
-        <button class="side-menu-theme" type="button" role="switch" aria-checked="false" disabled title="Пока недоступно">
-          <img class="theme-icon" src="../images/icons/ic-m-moon.svg" alt=""><span>Тёмная тема</span><img class="theme-toggle" src="../images/icons/ic-toggle-off.svg" alt="">
+        <button class="side-menu-theme" type="button" role="switch" aria-checked="false">
+          <img class="theme-icon" src="../images/icons/ic-m-moon.svg" alt=""><span>Тёмная тема</span><span class="theme-switch" aria-hidden="true"></span>
         </button>
+        <nav class="side-menu-links side-menu-logout" aria-label="Выход"><a href="login.html" data-logout><img src="../images/icons/ic-logout.svg" alt=""><span>Выйти</span></a></nav>
       </div>`;
-    document.body.append(dialog);
+    document.body.append(dialog);window.ThemeUI?.sync();
     const current = new URL(location.href); current.searchParams.delete('menu'); current.searchParams.delete('notifications');
     dialog.querySelectorAll('a').forEach(link => {
       const target = new URL(link.href);

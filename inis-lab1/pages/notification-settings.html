@@ -2,12 +2,22 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8">
+<script src="../js/theme.js"></script>
+<script src="../js/ui-feedback.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
 <title>AI-интервьюер — Настройки оповещений</title>
 <link rel="stylesheet" href="../css/style.css">
 <link rel="stylesheet" href="../css/ui.css">
+<script src="../js/platform-data.js" defer></script>
+<script src="../js/progression.js" defer></script>
+<script src="../js/technology-tracks.js" defer></script>
+<script src="../js/enhancements.js" defer></script>
 <script src="../js/app.js" defer></script>
 <script src="../js/notifications.js" defer></script>
+<link rel="stylesheet" href="../css/enhancements.css">
+<link rel="stylesheet" href="../css/refinements.css">
+<link rel="stylesheet" href="../css/themes.css">
+<script src="../js/refinements.js" defer></script>
 </head>
 <body>
 
@@ -23,7 +33,7 @@
       <div class="setting-row"><div><h3>Push-уведомления</h3><p class="muted">О новых тренировках</p></div><button type="button" class="tgb" role="switch" aria-checked="true" aria-label="Push-уведомления" data-setting="push"><img src="../images/icons/ic-toggle-on.svg" alt=""></button></div>
       <div class="setting-row"><div><h3>Email-рассылка</h3><p class="muted">Еженедельный отчет</p></div><button type="button" class="tgb" role="switch" aria-checked="true" aria-label="Email-рассылка" data-setting="email"><img src="../images/icons/ic-toggle-on.svg" alt=""></button></div>
       <div class="setting-row"><div><h3>SMS</h3><p class="muted">Только важные</p></div><button type="button" class="tgb" role="switch" aria-checked="false" aria-label="SMS" data-setting="sms"><img src="../images/icons/ic-toggle-off.svg" alt=""></button></div>
-      <div class="setting-row"><h3>Время «не беспокоить»</h3><span>22:30–07:00</span></div>
+      <div class="setting-row"><h3>Время «не беспокоить»</h3><button class="text-button" id="quiet-hours" type="button" aria-haspopup="dialog" aria-controls="quiet-dialog">22:30–07:00</button></div>
     </section>
     <button type="button" class="form-button" id="save-notification-settings">Сохранить</button>
     <p class="muted" id="settings-status" role="status"></p>

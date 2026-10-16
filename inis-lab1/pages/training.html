@@ -2,13 +2,23 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8">
+<script src="../js/theme.js"></script>
+<script src="../js/ui-feedback.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
 <title>AI-интервьюер — Тренировка</title>
 <link rel="stylesheet" href="../css/style.css">
 <link rel="stylesheet" href="../css/ui.css">
 <script src="../js/daily-tasks.js" defer></script>
+<script src="../js/platform-data.js" defer></script>
+<script src="../js/progression.js" defer></script>
+<script src="../js/technology-tracks.js" defer></script>
+<script src="../js/enhancements.js" defer></script>
 <script src="../js/app.js" defer></script>
 <script src="../js/notifications.js" defer></script>
+<link rel="stylesheet" href="../css/enhancements.css">
+<link rel="stylesheet" href="../css/refinements.css">
+<link rel="stylesheet" href="../css/themes.css">
+<script src="../js/refinements.js" defer></script>
 </head>
 <body>
 
@@ -20,11 +30,11 @@
   </header>
   <div class="content-inner">
     <h2 class="page-title">Выберите режим</h2>
-    <div class="mode-grid" id="modes" role="radiogroup" aria-label="Режим тренировки"><button type="button" class="tc ui-card on" role="radio" aria-checked="true"><img src="../images/icons/ic-bolt.svg" alt=""><span><strong>Быстрая сессия</strong><span class="muted">10 вопросов по вашему направлению</span></span><img class="mode-chevron" src="../images/icons/ic-chevron-right.svg" alt=""></button><button type="button" class="tc ui-card" role="radio" aria-checked="false"><img src="../images/icons/ic-target.svg" alt=""><span><strong>По теме</strong><span class="muted">Фокус на выбранной теме или технологии</span></span><img class="mode-chevron" src="../images/icons/ic-chevron-right.svg" alt=""></button><button type="button" class="tc ui-card" role="radio" aria-checked="false"><img src="../images/icons/ic-people.svg" alt=""><span><strong>Полная симуляция интервью</strong><span class="muted">Реальный формат собеседования</span></span><img class="mode-chevron" src="../images/icons/ic-chevron-right.svg" alt=""></button></div>
+    <div class="mode-grid" id="modes" role="radiogroup" aria-label="Режим тренировки"><button type="button" class="tc ui-card on" role="radio" aria-checked="true"><img src="../images/icons/ic-bolt.svg" alt=""><span><strong>Быстрая сессия</strong><span class="muted">10 вопросов по пройденным темам</span></span><img class="mode-chevron" src="../images/icons/ic-chevron-right.svg" alt=""></button><button type="button" class="tc ui-card" role="radio" aria-checked="false"><img src="../images/icons/ic-target.svg" alt=""><span><strong>По теме</strong><span class="muted">Фокус на выбранной теме или технологии</span></span><img class="mode-chevron" src="../images/icons/ic-chevron-right.svg" alt=""></button><button type="button" class="tc ui-card" role="radio" aria-checked="false"><img src="../images/icons/ic-people.svg" alt=""><span><strong>Полная симуляция интервью</strong><span class="muted">Реальный формат собеседования</span></span><img class="mode-chevron" src="../images/icons/ic-chevron-right.svg" alt=""></button></div>
     <div class="mode-grid"><a class="tc ui-card" id="daily-mode-link" href="daily-tasks.html"><img src="../images/icons/ic-daily-calendar.svg" alt=""><span><strong>Ежедневные задания</strong><span class="muted">HTTP, API и SQL · Прогресс в плане на сегодня</span></span><img class="mode-chevron" src="../images/icons/ic-chevron-right.svg" alt=""></a></div>
     <section class="ui-card training-settings"><h2>Настройки интервью</h2>
       <div class="filter-chips" id="hints"><button type="button" class="hintc on"><span>С RAG-подсказками</span></button><button type="button" class="hintc"><span>Без подсказок</span></button></div>
-      <div class="form-field"><label for="dur">Длительность</label><select class="form-control profile-select" id="dur"><option>5 минут</option><option>10 минут</option><option selected>15 минут</option><option>30 минут</option></select></div>
+      <div class="form-field"><label for="dur">Длительность</label><button class="form-control profile-select specialization-select" id="duration-picker" type="button" aria-haspopup="dialog" aria-controls="duration-dialog"><span>15 минут</span></button><input id="dur" type="hidden" value="15"></div>
       <a class="form-button" data-start-training href="training-question-1.html">Начать тренировку</a>
     </section>
   </div>
@@ -37,6 +47,6 @@
   </nav>
 </main>
 <script src="../js/screens3.js"></script>
-<script src="../js/training-session.js"></script>
+<script src="../js/training-engine.js" defer></script>
 </body>
 </html>

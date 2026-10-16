@@ -1,34 +1,19 @@
 (() => {
-  const seg=document.getElementById('seg');
-  seg?.addEventListener('click',event=>{const button=event.target.closest('button'); if(!button)return; seg.querySelectorAll('button').forEach(b=>{b.classList.toggle('on',b===button);b.setAttribute('aria-selected',String(b===button));});});
-  const chips=document.getElementById('chips');
-  chips?.addEventListener('click',event=>{const button=event.target.closest('button');if(button)chips.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b===button));});
-  const key='inis.favorite-questions.v1'; let favorites=new Set();
-  try { const saved=JSON.parse(localStorage.getItem(key)||'[]');if(Array.isArray(saved))favorites=new Set(saved.filter(x=>typeof x==='string')); } catch {}
-  const favoriteView=new URLSearchParams(location.search).get('view')==='favorites';
-  const query=document.getElementById('q'),empty=document.getElementById('empty-questions');
-  const filter=()=>{
-    let visible=0; const text=(query?.value||'').trim().toLowerCase();
-    document.querySelectorAll('.kcard').forEach(card=>{
-      const matches=card.querySelector('.kc').getAttribute('aria-label').toLowerCase().includes(text);
-      card.hidden=!matches||(favoriteView&&!favorites.has(card.dataset.question));
-      if(!card.hidden)visible++;
-    });
-    if(empty){empty.hidden=visible!==0;empty.textContent=favoriteView?'В избранном пока нет подходящих вопросов. Добавьте их с помощью звёздочки в базе знаний.':'Вопросы не найдены.';}
+ const setup=()=>{
+  const P=window.Platform;if(!P)return;const e=P.escape,key='inis.favorite-questions.v1',args=new URLSearchParams(location.search),favoriteView=args.get('view')==='favorites';
+  const saved=P.store.get(key,[]);let favorites=new Set(Array.isArray(saved)?saved.filter(x=>typeof x==='string'):[]),selected=args.get('topic')||'',expanded=false;
+  const cards=document.getElementById('cards'),chips=document.querySelector('#chips.filter-chips'),query=document.getElementById('q'),empty=document.getElementById('empty-questions');if(!cards)return;
+  const allowed=new Set(P.knowledgeTopics()),bank=P.questions.filter(q=>allowed.has(q.topic));
+  const topics=[...new Set(bank.map(q=>q.topic))];const ordered=[...P.knowledgeTopics().filter(t=>topics.includes(t))];if(!topics.includes(selected))selected='';if(selected&&ordered.indexOf(selected)>=10)expanded=true;query.value=args.get('q')||'';
+  const topicButton=t=>`<button type="button" class="chipk ${selected===t?'on':''}" data-filter-topic="${e(t)}" aria-pressed="${selected===t}"><span>${e(t||'Все темы')}</span></button>`;
+  const renderTopics=()=>{chips.innerHTML=topicButton('')+ordered.slice(0,10).map(topicButton).join('')+`<button type="button" ${ordered.length>10?'':'hidden'} class="chipk more-topics" id="more-topics" aria-expanded="${expanded}" aria-controls="extra-topics" aria-label="${expanded?'Скрыть дополнительные темы':'Показать ещё темы'}"><span aria-hidden="true">${expanded?'×':'⋯'}</span></button><div class="extra-topics" id="extra-topics" ${expanded?'':'hidden'}>${ordered.slice(10).map(topicButton).join('')}</div>`;};
+  const detailHref=q=>{const p=new URLSearchParams();if(q.id!=='q1')p.set('question',q.id);if(favoriteView)p.set('view','favorites');if(selected)p.set('topic',selected);if(query.value.trim())p.set('q',query.value.trim());return (q.id==='q1'?'kb-2.html':'kb-case.html')+(p.size?'?'+p:'');};
+  const updateUrl=()=>{const p=new URLSearchParams();if(favoriteView)p.set('view','favorites');if(selected)p.set('topic',selected);if(query.value.trim())p.set('q',query.value.trim());history.replaceState(history.state,'',location.pathname+(p.size?'?'+p:''));};
+  const render=()=>{const text=query.value.trim().toLocaleLowerCase('ru-RU'),list=bank.filter(q=>(!selected||q.topic===selected)&&(!favoriteView||favorites.has(q.id))&&`${q.title} ${q.topic}`.toLocaleLowerCase('ru-RU').includes(text));
+   cards.innerHTML=list.map(q=>`<article class="kcard ui-card" data-question="${e(q.id)}" data-topic="${e(q.topic)}"><div class="question-row"><a class="kc" href="${e(detailHref(q))}" aria-label="${e(q.title)}"><h2>${e(q.title)}</h2></a><button type="button" class="starb" aria-label="${favorites.has(q.id)?'Удалить из избранного':'В избранное'}" aria-pressed="${favorites.has(q.id)}" data-favorite="${e(q.id)}"><img src="../images/icons/ic-star.svg" alt=""></button></div><div class="question-tags"><span class="muted">Вопрос по теме</span><span class="pill">${e(q.topic)}</span></div></article>`).join('');empty.hidden=list.length>0;empty.textContent=!allowed.size?'Выберите направление подготовки, чтобы увидеть темы и вопросы.':favoriteView?'В избранном нет вопросов по выбранному направлению и условиям поиска. Добавьте вопросы из базы знаний.':'По выбранной теме и запросу вопросов нет.';updateUrl();
   };
-  if(favoriteView){const title=document.querySelector('.app-header h1');if(title)title.textContent='Избранное';}
-  query?.addEventListener('input',filter);
-  document.getElementById('sf')?.addEventListener('submit',e=>e.preventDefault());
-  document.querySelectorAll('.starb,#fav').forEach(button=>{
-    const id=button.dataset.question||button.closest('.kcard')?.dataset.question;
-    button.setAttribute('aria-pressed',String(favorites.has(id)));
-    button.addEventListener('click',event=>{
-      event.preventDefault();event.stopPropagation();
-      if(favorites.has(id))favorites.delete(id);else favorites.add(id);
-      button.setAttribute('aria-pressed',String(favorites.has(id)));
-      try{localStorage.setItem(key,JSON.stringify([...favorites]));}catch{}
-      filter();
-    });
-  });
-  filter();
+  chips.addEventListener('click',event=>{if(event.target.closest('#more-topics')){expanded=!expanded;if(!expanded&&ordered.indexOf(selected)>=10)selected='';renderTopics();render();document.getElementById('more-topics').focus({preventScroll:true});return;}const b=event.target.closest('[data-filter-topic]');if(!b)return;selected=b.dataset.filterTopic;renderTopics();render();chips.querySelector(`[data-filter-topic="${CSS.escape(selected)}"]`).focus({preventScroll:true});});
+  query.addEventListener('input',render);document.getElementById('sf').addEventListener('submit',event=>event.preventDefault());cards.addEventListener('click',event=>{const b=event.target.closest('[data-favorite]');if(!b)return;const id=b.dataset.favorite,next=new Set(favorites);next.has(id)?next.delete(id):next.add(id);if(!P.store.set(key,[...next])){window.AppToast.show('Не удалось сохранить избранное','error');return;}favorites=next;render();(cards.querySelector(`[data-favorite="${CSS.escape(id)}"]`)||cards.querySelector('[data-favorite]')||query).focus({preventScroll:true});});
+  if(favoriteView)document.querySelector('.app-header h1').textContent='Избранное';renderTopics();render();if(!allowed.size){chips.hidden=true;document.getElementById('sf').hidden=true;const link=document.createElement('a');link.className='form-button secondary';link.href='choose-direction.html';link.textContent='Выбрать направление';empty.after(link);}
+ };if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setup,{once:true});else setup();
 })();

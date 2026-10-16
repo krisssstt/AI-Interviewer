@@ -41,6 +41,7 @@
     document.getElementById('progress-duration').textContent = selected.mode === 'custom' ? 'за выбранный период' : `за ${selected.mode} дней`;
     custom.setAttribute('aria-label', selected.mode === 'custom' ? `Период: ${range}. Изменить период` : 'Выбрать период');
     try { sessionStorage.setItem(storageKey, JSON.stringify(selected)); } catch {}
+    window.dispatchEvent(new CustomEvent('inis:period-change',{detail:selected}));
   };
   const render = (restoreFocus = false) => {
     document.getElementById('calendar-month').textContent = monthName.format(month);

@@ -2,12 +2,23 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8">
+<script src="../js/theme.js"></script>
+<script src="../js/ui-feedback.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
 <title>AI-интервьюер — Вопрос: PUT и PATCH</title>
 <link rel="stylesheet" href="../css/style.css">
 <link rel="stylesheet" href="../css/ui.css">
+<script src="../js/platform-data.js" defer></script>
+<script src="../js/progression.js" defer></script>
+<script src="../js/technology-tracks.js" defer></script>
+<script src="../js/enhancements.js" defer></script>
 <script src="../js/app.js" defer></script>
 <script src="../js/notifications.js" defer></script>
+<link rel="stylesheet" href="../css/enhancements.css">
+<link rel="stylesheet" href="../css/refinements.css">
+<link rel="stylesheet" href="../css/themes.css">
+<script src="../js/refinements.js" defer></script>
+<script src="../js/knowledge-detail.js" defer></script>
 </head>
 <body>
 
@@ -17,14 +28,7 @@
     <h1>База знаний</h1>
     <a class="header-action" href="profile-4.html" aria-label="Уведомления"><img src="../images/icons/ic-bell.svg" alt=""></a>
   </header>
-  <div class="content-inner reading-page">
-    <h2 class="page-title">Чем отличаются методы PUT и PATCH?</h2>
-    <div class="question-tags"><span class="pill">API testing</span><span class="muted">Легкий</span></div>
-    <section class="ui-card recommendation"><h3><img src="../images/icons/ic-ai-brain.svg" alt="">AI-рекомендация</h3><p>PUT заменяет ресурс целиком, а PATCH изменяет только переданные поля. Обратите внимание на идемпотентность этих методов.</p><p class="pill"><img src="../images/icons/ic-sparkle.svg" alt="">RAG-контекст подключен</p></section>
-    <section class="ui-card"><h3>Пример ответа</h3><p>PUT /users/1 с объектом перезапишет все поля.</p><p>PATCH /users/1 изменит только поле, отправленное в теле запроса.</p></section>
-    <a class="form-button" href="training.html">Тренировать</a>
-    <button type="button" class="form-button secondary" id="fav" data-question="q1" aria-pressed="false"><img src="../images/icons/ic-star.svg" alt=""><span>В избранное</span></button>
-  </div>
+  <div class="content-inner reading-page knowledge-detail" id="knowledge-detail" data-question="q1"></div>
   <nav class="app-nav" aria-label="Основная навигация">
     <a href="main.html"><img src="../images/icons/ic-nav-home-off.svg" alt=""><span>Главная</span></a>
     <a href="training.html"><img src="../images/icons/ic-nav-chat.svg" alt=""><span>Тренировка</span></a>

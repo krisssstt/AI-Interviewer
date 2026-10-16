@@ -2,13 +2,24 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8">
+<script src="../js/theme.js"></script>
+<script src="../js/ui-feedback.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
 <title>AI-интервьюер — Профиль</title>
 <link rel="stylesheet" href="../css/style.css">
 <link rel="stylesheet" href="../css/profile.css">
 <link rel="stylesheet" href="../css/ui.css">
+<script src="../js/platform-data.js" defer></script>
+<script src="../js/progression.js" defer></script>
+<script src="../js/technology-tracks.js" defer></script>
+<script src="../js/training-engine.js" defer></script>
+<script src="../js/enhancements.js" defer></script>
 <script src="../js/app.js" defer></script>
 <script src="../js/notifications.js" defer></script>
+<link rel="stylesheet" href="../css/enhancements.css">
+<link rel="stylesheet" href="../css/refinements.css">
+<link rel="stylesheet" href="../css/themes.css">
+<script src="../js/refinements.js" defer></script>
 </head>
 <body>
 <main class="screen profile">
@@ -19,9 +30,15 @@
   </header>
   <section class="profile-content content-inner form-page" aria-label="Редактирование профиля">
     <div class="profile-summary">
-      <span class="avatar" aria-hidden="true">КК</span>
+      <button class="avatar avatar-picker" type="button" id="choose-profile-photo" aria-label="Фото профиля" aria-haspopup="dialog" aria-controls="profile-photo-dialog"><span class="avatar-content">КК</span><span class="avatar-camera" aria-hidden="true"><img src="../images/icons/ic-camera.svg" alt=""></span></button>
       <div><h2>Кристина Ковалева</h2><p>QA Engineer · Middle</p></div>
     </div>
+    <section class="profile-photo-controls" aria-label="Фотография профиля">
+      <input type="file" id="profile-photo-file" accept="image/jpeg,image/png,image/webp" aria-label="Фотография профиля" aria-describedby="profile-photo-error" hidden>
+      <input type="file" id="profile-camera-file" accept="image/jpeg,image/png,image/webp" capture="user" aria-label="Сделать новое фото" aria-describedby="profile-photo-error" hidden>
+      <p class="field-error" id="profile-photo-error" role="alert" hidden></p>
+      
+    </section>
     <form class="profile-form" id="pf" autocomplete="on">
       <div class="form-field">
         <label for="fn">Имя</label>
@@ -35,14 +52,14 @@
         <label for="em">Email</label>
         <input class="form-control" id="em" name="email" type="email" value="kristinakovalyova23@gmail.com" autocomplete="email">
       </div>
-      <div class="form-field">
-        <label id="specialization-label" for="sp">Специализация</label>
-        <button class="form-control profile-select specialization-select" id="sp" type="button" role="combobox" aria-labelledby="specialization-label" aria-haspopup="listbox" aria-expanded="false" aria-controls="specialization-options"><span>QA Engineer</span></button>
-        <input type="hidden" id="specialization-value" name="specialization" value="QA Engineer">
-      </div>
+      <section class="ui-card profile-specialization" aria-labelledby="specialization-label">
+        <h3 id="specialization-label"><img src="../images/icons/ic-target.svg" alt="">Профиль подготовки</h3>
+        <dl class="specialization-details"><div><dt>Направление</dt><dd id="profile-direction">QA Engineer</dd></div><div><dt>Язык или технология</dt><dd id="profile-technology">Не выбрана</dd></div></dl>
+        <button class="form-button secondary" id="change-technology" type="button" aria-haspopup="dialog" aria-controls="change-preparation-dialog">Изменить направление или технологию</button>
+      </section>
       <div class="form-field">
         <label for="gr">Грейд</label>
-        <input class="form-control" id="gr" name="grade" type="text" value="Middle">
+        <input class="form-control" id="gr" name="grade" type="text" value="Не определён" readonly aria-describedby="grade-help"><p class="muted" id="grade-help">Грейд определяется диагностикой и повышается после выполнения плана.</p><a class="text-link" href="main.html?plan=open#personal-plan">Путь к следующему грейду ›</a>
       </div>
       <div class="skills-field">
         <p class="field-label">Навыки</p>
@@ -57,7 +74,7 @@
       <div class="form-field">
         <label for="newSkill">Новый навык</label>
         <div class="skill-entry">
-          <input class="form-control" id="newSkill" type="text" placeholder="Название навыка">
+          <input class="form-control" id="newSkill" type="text" placeholder="Найдите навык" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="skill-suggestions" autocomplete="off">
           <button class="add-btn" id="addSkill" type="button" aria-label="Добавить навык"></button>
         </div>
       </div>
@@ -72,7 +89,8 @@
     <a href="profile-1.html" aria-current="page"><img src="../images/icons/ic-nav-profile-on.svg" alt=""><span>Профиль</span></a>
   </nav>
 </main>
-<script src="../js/profile.js"></script>
-<script src="../js/specialization.js"></script>
+<script src="../js/skill-catalog.js" defer></script>
+<script src="../js/profile.js" defer></script>
+
 </body>
 </html>

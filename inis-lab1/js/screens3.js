@@ -10,6 +10,4 @@ if(mic){mic.addEventListener('click',function(){mic.setAttribute('aria-pressed',
 var sb=document.getElementById('sendb');
 if(sb&&ans){sb.addEventListener('click',function(e){if(!ans.value.trim()){e.preventDefault();ans.focus();}});}
 document.querySelectorAll('.tgb').forEach(function(b){b.addEventListener('click',function(){var on=b.getAttribute('aria-checked')!=='true';b.setAttribute('aria-checked',on?'true':'false');b.querySelector('img').src='../images/icons/ic-toggle-'+(on?'on':'off')+'.svg';});});
-var sv=document.getElementById('sv');
-if(sv){sv.addEventListener('click',function(){sv.textContent='Сохранено';setTimeout(function(){sv.textContent='Сохранить';},1500);});}
 })();
