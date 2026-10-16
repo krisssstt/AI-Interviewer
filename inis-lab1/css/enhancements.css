@@ -45,15 +45,10 @@ button, input, textarea, select { font-family: inherit; }
 .app-header .session-name { font-size: 16px; line-height: 22px; }
 .session-exit-dialog .exit-actions { gap: 16px; }
 @media (max-width:767px) {
-  /* Safari gives the real safe area. A minimum also protects standalone phone previews. */
-  :root { --ui-safe-top: max(24px, env(safe-area-inset-top, 0px)); }
   .onboarding-content { padding-top: 24px; }
   .ui-dialog { padding: 16px; }
   .form-control, .answer-input { font-size: 16px; }
   .app-header .session-name { font-size: 14px; line-height: 20px; }
-}
-@media (orientation:landscape) and (max-height:500px) {
-  :root { --ui-safe-top: env(safe-area-inset-top,0px); }
 }
 .form-button:disabled { opacity: .55; cursor: default; }
 #upload-document { display: flex; flex-direction: column; gap: var(--ui-gap); }
